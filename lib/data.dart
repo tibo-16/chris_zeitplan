@@ -6,7 +6,10 @@ class Data {
   List<Day> days = [];
   List<String> dayStrings = [];
 
-  Data({this.dayStrings}) {
+  String book = "";
+  String page = "";
+
+  Data({this.dayStrings, this.book, this.page}) {
     for (String dayString in dayStrings) {
       days.add(Day.fromString(dayString));
     }

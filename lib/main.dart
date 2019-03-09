@@ -29,6 +29,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   Data _data = Data.init();
   TextEditingController _controller = TextEditingController();
+  TextEditingController _bookController = TextEditingController();
+  TextEditingController _pageController = TextEditingController();
 
   @override
   void initState() {
@@ -40,6 +42,9 @@ class _MyHomePageState extends State<MyHomePage> {
       Day today = Utils.getToday(_data);
       if (today != null && today.extraPages > 0)
         _controller.text = '${today.extraPages}';
+
+      if (data.book != "") _bookController.text = data.book;
+      if (data.page != "") _pageController.text = data.page;
     });
 
     super.initState();
@@ -109,6 +114,16 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  _book(String text) {
+    _data.book = text;
+    Repo.saveData(_data);
+  }
+
+  _page(String text) {
+    _data.page = text;
+    Repo.saveData(_data);
+  }
+
   _reset() {
     showDialog(
       context: context,
@@ -131,6 +146,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   Repo.removeKey('days');
                   _data = Data.init();
                   _controller.clear();
+                  _bookController.clear();
+                  _pageController.clear();
                   FocusScope.of(context).requestFocus(new FocusNode());
                 });
                 Navigator.of(context).pop();
@@ -209,12 +226,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 fontSize: 20,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.bold)),
-        TextField(
-          controller: _controller,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20),
-          keyboardType: TextInputType.number,
-          onChanged: (text) => _extra(text),
+        Container(
+          width: 100,
+          child: TextField(
+            controller: _controller,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 20),
+            keyboardType: TextInputType.number,
+            onChanged: (text) => _extra(text),
+          ),
         )
       ],
     ));
@@ -243,6 +263,56 @@ class _MyHomePageState extends State<MyHomePage> {
         )
       ],
     ));
+  }
+
+  Widget _buildBook() {
+    return Column(
+      children: <Widget>[
+        Text(
+          'Aktuelles Buch',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 20,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.bold),
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width * 0.75,
+          child: TextField(
+            controller: _bookController,
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.multiline,
+            maxLines: 2,
+            onChanged: (text) => _book(text),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildPage() {
+    return Column(
+      children: <Widget>[
+        Text(
+          'Aktuelle Seite',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 20,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.bold),
+        ),
+        Container(
+          width: 80,
+          child: TextField(
+            controller: _pageController,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 20),
+            keyboardType: TextInputType.number,
+            onChanged: (text) => _page(text),
+          ),
+        )
+      ],
+    );
   }
 
   Widget _buildReset() {
@@ -297,6 +367,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[_buildExtra(), _buildAll()],
                     ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    _buildBook(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    _buildPage(),
                   ],
                 ),
                 // Positioned(

@@ -7,8 +7,10 @@ class Repo {
     final prefs = await SharedPreferences.getInstance();
 
     final days = prefs.getStringList('days') ?? [];
+    final book = prefs.getString('book') ?? "";
+    final page = prefs.getString('page') ?? "";
 
-    return Data(dayStrings: days);
+    return Data(dayStrings: days, book: book, page: page);
   }
 
   static saveData(Data data) async {
@@ -21,6 +23,18 @@ class Repo {
       data.days.forEach((day) => dayStrings.add(Day.toRepoString(day)));
 
       prefs.setStringList('days', dayStrings);
+    }
+
+    if (data.book == "") {
+      removeKey('book');
+    } else {
+      prefs.setString('book', data.book);
+    }
+
+    if (data.page == "") {
+      removeKey('page');
+    } else {
+      prefs.setString('page', data.page);
     }
   }
 
