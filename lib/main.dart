@@ -39,6 +39,13 @@ class _MyHomePageState extends State<MyHomePage> {
         this._data = data;
       });
 
+      // Fixer Startzeitpunkt
+      if (_data.days.isEmpty) {
+        _data.days.add(Day(
+            date: DateTime(2019, 3, 1), dayLimitReached: false, extraPages: 0));
+        Repo.saveData(_data);
+      }
+
       Day today = Utils.getToday(_data);
       if (today != null && today.extraPages > 0)
         _controller.text = '${today.extraPages}';

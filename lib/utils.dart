@@ -39,7 +39,11 @@ class Utils {
   static Day getToday(Data data) {
     if (data.days.isEmpty) return null;
 
-    return data.days.firstWhere((day) => isToday(day.date), orElse: null);
+    List<Day> possibleToday = data.days.where((day) => isToday(day.date)).toList();
+    if (possibleToday.isEmpty)
+      return null;
+    else
+      return possibleToday.first;
   }
 
   static bool todayRead(Data data) {
