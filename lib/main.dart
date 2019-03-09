@@ -203,8 +203,7 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 10,
             ),
             FlatButton(
-              color:
-                  readToday ? Theme.of(context).primaryColor : Colors.redAccent,
+              color: readToday ? Colors.green.shade500 : Colors.redAccent,
               child: Text(
                 readToday
                     ? 'Heute schon gelesen!'
@@ -248,28 +247,33 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildAll() {
-    return Expanded(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          'Gesamt',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 20,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.bold),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Text(
-          all,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-        )
-      ],
-    ));
+    return Container(
+      width: 100,
+      decoration: BoxDecoration(
+    color: Colors.grey.shade50,
+      ),
+      child: Column(
+    mainAxisAlignment: MainAxisAlignment.start,
+    children: <Widget>[
+      Text(
+        'Gesamt',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            fontSize: 20,
+            fontStyle: FontStyle.italic,
+            fontWeight: FontWeight.bold),
+      ),
+      SizedBox(
+        height: 10,
+      ),
+      Text(
+        all,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+      )
+    ],
+      ),
+    );
   }
 
   Widget _buildBook() {
@@ -284,12 +288,11 @@ class _MyHomePageState extends State<MyHomePage> {
               fontWeight: FontWeight.bold),
         ),
         Container(
-          width: MediaQuery.of(context).size.width * 0.75,
+          width: 80,
           child: TextField(
             controller: _bookController,
             textAlign: TextAlign.center,
-            keyboardType: TextInputType.multiline,
-            maxLines: 2,
+            style: TextStyle(fontSize: 20),
             onChanged: (text) => _book(text),
           ),
         )
@@ -343,12 +346,14 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
               // Colors are easy thanks to Flutter's Colors class.
-              Colors.blue.shade50,
-              Colors.blue.shade600
+              Colors.black,
+              Colors.blue.shade400,
+              Colors.blue.shade600,
+              Colors.black
             ],
           ),
         ),
@@ -363,11 +368,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     SizedBox(
-                      height: 30,
+                      height: 120,
                     ),
                     _buildToday(),
                     SizedBox(
-                      height: 30,
+                      height: 50,
                     ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,7 +380,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: <Widget>[_buildExtra(), _buildAll()],
                     ),
                     SizedBox(
-                      height: 30,
+                      height: 50,
                     ),
                     _buildBook(),
                     SizedBox(
