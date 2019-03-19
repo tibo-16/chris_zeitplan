@@ -39,10 +39,15 @@ class _MyHomePageState extends State<MyHomePage> {
         this._data = data;
       });
 
+      // FAKE DATA
+      _data.start = DateTime(2019, 3, 1);
+      _data.end = DateTime(2019, 3, 31);
+      _data.pages = 550;
+
       // Fixer Startzeitpunkt
-      if (_data.days.isEmpty) {
-        _data.days.add(Day(
-            date: DateTime(2019, 3, 1), dayLimitReached: false, extraPages: 0));
+      if (_data.start != null) {
+        _data.days.insert(
+            0, Day(date: _data.start, dayLimitReached: false, extraPages: 0));
         Repo.saveData(_data);
       }
 
@@ -77,6 +82,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String get all {
     return '${_data.pages - Utils.getNumberOfReadPages(_data)}';
+  }
+
+  String get startTime {
+    return _data.start == null ? 'Auswählen' : _data.start.toString();
   }
 
   // Functions
@@ -131,40 +140,86 @@ class _MyHomePageState extends State<MyHomePage> {
     Repo.saveData(_data);
   }
 
+// FUNKTIONIERT SO NICHT; DER DIALOG SELBST MUSS AUCH EIN STATEFUL WIDGET SEIN!!! SEIHE CASHTIME
+  _pickStart(BuildContext context) {
+    showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2019, 1, 1),
+            lastDate: DateTime.now().add(Duration(days: 1000)))
+        .then((start) {
+      print(start);
+
+      if (start != null) {
+        setState(() {
+          _data.start = start;
+        });
+      }
+    });
+  }
+
   _reset() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text("Reset"),
-          content:
-              new Text("Möchtest du wirklich deinen Lesefortschritt löschen?"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Text(
+                'Gesamtanzahl Seiten:',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+              ),
+              TextField(),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Text(
+                  'Startdatum:',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                ),
+              ),
+              FlatButton(
+                child: Text(
+                  startTime,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                color: Colors.blue.shade600,
+                textColor: Colors.white,
+                onPressed: () => _pickStart(context),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Text(
+                  'Enddatum:',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                ),
+              ),
+              FlatButton(
+                child: Text(
+                  'Auswählen',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                color: Colors.blue.shade600,
+                textColor: Colors.white,
+                onPressed: () => print('end'),
+              )
+            ],
+          ),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
               child: new Text(
-                "Ja",
+                "SPEICHERN",
                 style: TextStyle(
                     color: Colors.redAccent, fontWeight: FontWeight.bold),
               ),
               onPressed: () {
-                setState(() {
-                  Repo.removeKey('days');
-                  _data = Data.init();
-                  _controller.clear();
-                  _bookController.clear();
-                  _pageController.clear();
-                  FocusScope.of(context).requestFocus(new FocusNode());
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-            new FlatButton(
-              child: new Text(
-                "Nein",
-              ),
-              onPressed: () {
+                // Speichern
                 Navigator.of(context).pop();
               },
             ),
@@ -250,28 +305,28 @@ class _MyHomePageState extends State<MyHomePage> {
     return Container(
       width: 100,
       decoration: BoxDecoration(
-    color: Colors.grey.shade50,
+        color: Colors.grey.shade50,
       ),
       child: Column(
-    mainAxisAlignment: MainAxisAlignment.start,
-    children: <Widget>[
-      Text(
-        'Gesamt',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            fontSize: 20,
-            fontStyle: FontStyle.italic,
-            fontWeight: FontWeight.bold),
-      ),
-      SizedBox(
-        height: 10,
-      ),
-      Text(
-        all,
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
-      )
-    ],
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Gesamt',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontSize: 20,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            all,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+          )
+        ],
       ),
     );
   }
@@ -325,79 +380,73 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildReset() {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: FlatButton(
-            color: Colors.redAccent,
-            textColor: Colors.white,
-            child: Text('RESET', style: TextStyle(fontWeight: FontWeight.bold)),
-            onPressed: _reset,
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              // Colors are easy thanks to Flutter's Colors class.
-              Colors.black,
-              Colors.blue.shade400,
-              Colors.blue.shade600,
-              Colors.black
-            ],
-          ),
-        ),
-        child: SafeArea(
-          top: true,
-          child: GestureDetector(
-            onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
-            behavior: HitTestBehavior.opaque,
-            child: Stack(
-              children: <Widget>[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    SizedBox(
-                      height: 120,
-                    ),
-                    _buildToday(),
-                    SizedBox(
-                      height: 50,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[_buildExtra(), _buildAll()],
-                    ),
-                    SizedBox(
-                      height: 50,
-                    ),
-                    _buildBook(),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    _buildPage(),
-                  ],
-                ),
-                // Positioned(
-                //     child: Align(
-                //         alignment: FractionalOffset.bottomCenter,
-                //         child: _buildReset()))
+    return Stack(
+      children: <Widget>[
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                // Colors are easy thanks to Flutter's Colors class.
+                Colors.black,
+                Colors.blue.shade400,
+                Colors.blue.shade600,
+                Colors.black
               ],
             ),
           ),
         ),
-      ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.build),
+                color: Colors.grey.shade50,
+                highlightColor: Colors.transparent,
+                splashColor: Colors.transparent,
+                onPressed: () => _reset(),
+              )
+            ],
+          ),
+          body: SafeArea(
+            top: true,
+            child: GestureDetector(
+              onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
+              behavior: HitTestBehavior.opaque,
+              child: ListView(
+                children: <Widget>[
+                  SizedBox(
+                    height: 80,
+                  ),
+                  _buildToday(),
+                  SizedBox(
+                    height: 50,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[_buildExtra(), _buildAll()],
+                  ),
+                  SizedBox(
+                    height: 50,
+                  ),
+                  _buildBook(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  _buildPage(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

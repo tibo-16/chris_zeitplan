@@ -6,15 +6,41 @@ class Repo {
   static Future<Data> readData() async {
     final prefs = await SharedPreferences.getInstance();
 
+    final pages = prefs.getInt('pages') ?? 100;
+    final start = prefs.getString('start') ?? '';
+    final end = prefs.getString('end') ?? '';
     final days = prefs.getStringList('days') ?? [];
     final book = prefs.getString('book') ?? "";
     final page = prefs.getString('page') ?? "";
 
-    return Data(dayStrings: days, book: book, page: page);
+    DateTime startTime = start.isNotEmpty ? DateTime.parse(start) : null;
+    DateTime endTime = end.isNotEmpty ? DateTime.parse(end) : null;
+
+    return Data(
+        pages: pages,
+        start: startTime,
+        end: endTime,
+        dayStrings: days,
+        book: book,
+        page: page);
   }
 
   static saveData(Data data) async {
     final prefs = await SharedPreferences.getInstance();
+
+    prefs.setInt('pages', data.pages);
+
+    if (data.start == null) {
+      removeKey('start');
+    } else {
+      prefs.setString('start', data.start.toIso8601String());
+    }
+
+    if (data.end == null) {
+      removeKey('end');
+    } else {
+      prefs.setString('end', data.end.toIso8601String());
+    }
 
     if (data.days.length == 0) {
       removeKey('days');

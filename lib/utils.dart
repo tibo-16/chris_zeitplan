@@ -2,11 +2,20 @@ import 'package:chris_zeitplan/data.dart';
 import 'package:chris_zeitplan/day.dart';
 
 class Utils {
+  static int _getDayLimit(Data data) {
+    if (data.start == null || data.end == null)
+      return 6;
+    else {
+      int days = data.end.difference(data.start).inDays;
+      return (data.pages / days).round();
+    }
+  }
+
   static int getNumberOfReadPages(Data data) {
     int pages = 0;
 
     for (Day day in data.days) {
-      pages += (day.dayLimitReached) ? 6 : 0;
+      pages += (day.dayLimitReached) ? _getDayLimit(data) : 0;
       pages += day.extraPages;
     }
 
@@ -21,12 +30,12 @@ class Utils {
   }
 
   static int _getNumberOfPagesWhichShouldHaveBeenRead(Data data) {
-    if (data.days.isEmpty) return 6;
+    if (data.days.isEmpty) return _getDayLimit(data);
 
     Day firstDay = data.days.first;
     int dayDifference = DateTime.now().difference(firstDay.date).inDays + 1;
 
-    return dayDifference * 6;
+    return dayDifference * _getDayLimit(data);
   }
 
   static bool isToday(DateTime compare) {
@@ -39,7 +48,8 @@ class Utils {
   static Day getToday(Data data) {
     if (data.days.isEmpty) return null;
 
-    List<Day> possibleToday = data.days.where((day) => isToday(day.date)).toList();
+    List<Day> possibleToday =
+        data.days.where((day) => isToday(day.date)).toList();
     if (possibleToday.isEmpty)
       return null;
     else
