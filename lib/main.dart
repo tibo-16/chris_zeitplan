@@ -1,7 +1,7 @@
 import 'package:chris_zeitplan/data.dart';
 import 'package:chris_zeitplan/day.dart';
 import 'package:chris_zeitplan/repo.dart';
-import 'package:chris_zeitplan/reset.dart';
+import 'package:chris_zeitplan/settings_content.dart';
 import 'package:chris_zeitplan/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -132,14 +132,14 @@ class _MyHomePageState extends State<MyHomePage> {
     Repo.saveData(_data);
   }
 
-  _reset() {
+  _settings() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          content: ResetContent(data: _data),
+          content: SettingsContent(data: _data),
           actions: <Widget>[
             FlatButton(
               child: Text(
@@ -158,6 +158,44 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       },
     );
+  }
+
+  _reset() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Fortschritt löschen'),
+            content:
+                Text('Möchtest du deinen Lesefortschritt komplett löschen?'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(
+                  'JA',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                textColor: Colors.redAccent,
+                onPressed: () {
+                  setState(() {
+                    _data.days = [];
+                    Repo.saveData(_data);
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              FlatButton(
+                child: Text(
+                  'NEIN',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+        });
   }
 
   // Build Functions
@@ -337,11 +375,18 @@ class _MyHomePageState extends State<MyHomePage> {
             elevation: 0,
             actions: <Widget>[
               IconButton(
+                icon: Icon(Icons.delete_outline),
+                color: Colors.redAccent,
+                highlightColor: Colors.transparent,
+                splashColor: Colors.transparent,
+                onPressed: () => _reset(),
+              ),
+              IconButton(
                 icon: Icon(Icons.build),
                 color: Colors.grey.shade50,
                 highlightColor: Colors.transparent,
                 splashColor: Colors.transparent,
-                onPressed: () => _reset(),
+                onPressed: () => _settings(),
               )
             ],
           ),

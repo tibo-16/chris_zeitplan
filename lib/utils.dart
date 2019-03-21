@@ -30,6 +30,8 @@ class Utils {
   }
 
   static int _getNumberOfPagesWhichShouldHaveBeenRead(Data data) {
+    if (data.start == null) return _getDayLimit(data);
+
     int dayDifference = DateTime.now().difference(data.start).inDays + 1;
 
     return dayDifference * _getDayLimit(data);

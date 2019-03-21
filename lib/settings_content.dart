@@ -2,15 +2,15 @@ import 'package:chris_zeitplan/data.dart';
 import 'package:chris_zeitplan/utils.dart';
 import 'package:flutter/material.dart';
 
-class ResetContent extends StatefulWidget {
+class SettingsContent extends StatefulWidget {
   final Data data;
 
-  ResetContent({Key key, this.data}) : super(key: key);
+  SettingsContent({Key key, this.data}) : super(key: key);
 
-  _ResetContentState createState() => _ResetContentState();
+  _SettingsContentState createState() => _SettingsContentState();
 }
 
-class _ResetContentState extends State<ResetContent> {
+class _SettingsContentState extends State<SettingsContent> {
   TextEditingController _controller = TextEditingController();
 
   void initState() {
