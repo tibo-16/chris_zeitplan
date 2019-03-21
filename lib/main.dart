@@ -1,6 +1,7 @@
 import 'package:chris_zeitplan/data.dart';
 import 'package:chris_zeitplan/day.dart';
 import 'package:chris_zeitplan/repo.dart';
+import 'package:chris_zeitplan/reset.dart';
 import 'package:chris_zeitplan/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -39,15 +40,10 @@ class _MyHomePageState extends State<MyHomePage> {
         this._data = data;
       });
 
-      // FAKE DATA
-      _data.start = DateTime(2019, 3, 1);
-      _data.end = DateTime(2019, 3, 31);
-      _data.pages = 550;
-
-      // Fixer Startzeitpunkt
-      if (_data.start != null) {
-        _data.days.insert(
-            0, Day(date: _data.start, dayLimitReached: false, extraPages: 0));
+      // Erster Start?
+      if (data.start == null) {
+        _data.start = DateTime.now();
+        _data.end = DateTime.now().add(Duration(days: 30));
         Repo.saveData(_data);
       }
 
@@ -82,10 +78,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String get all {
     return '${_data.pages - Utils.getNumberOfReadPages(_data)}';
-  }
-
-  String get startTime {
-    return _data.start == null ? 'Auswählen' : _data.start.toString();
   }
 
   // Functions
@@ -140,89 +132,28 @@ class _MyHomePageState extends State<MyHomePage> {
     Repo.saveData(_data);
   }
 
-// FUNKTIONIERT SO NICHT; DER DIALOG SELBST MUSS AUCH EIN STATEFUL WIDGET SEIN!!! SEIHE CASHTIME
-  _pickStart(BuildContext context) {
-    showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2019, 1, 1),
-            lastDate: DateTime.now().add(Duration(days: 1000)))
-        .then((start) {
-      print(start);
-
-      if (start != null) {
-        setState(() {
-          _data.start = start;
-        });
-      }
-    });
-  }
-
   _reset() {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text(
-                'Gesamtanzahl Seiten:',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-              ),
-              TextField(),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                child: Text(
-                  'Startdatum:',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                ),
-              ),
-              FlatButton(
-                child: Text(
-                  startTime,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                color: Colors.blue.shade600,
-                textColor: Colors.white,
-                onPressed: () => _pickStart(context),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                child: Text(
-                  'Enddatum:',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
-                ),
-              ),
-              FlatButton(
-                child: Text(
-                  'Auswählen',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                color: Colors.blue.shade600,
-                textColor: Colors.white,
-                onPressed: () => print('end'),
-              )
-            ],
-          ),
+          content: ResetContent(data: _data),
           actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text(
-                "SPEICHERN",
-                style: TextStyle(
-                    color: Colors.redAccent, fontWeight: FontWeight.bold),
+            FlatButton(
+              child: Text(
+                'SPEICHERN',
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
+              textColor: Colors.redAccent,
               onPressed: () {
-                // Speichern
-                Navigator.of(context).pop();
+                setState(() {
+                  Repo.saveData(_data);
+                  Navigator.pop(context);
+                });
               },
-            ),
+            )
           ],
         );
       },
@@ -436,11 +367,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   SizedBox(
                     height: 50,
                   ),
-                  _buildBook(),
-                  SizedBox(
-                    height: 20,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[_buildBook(), _buildPage()],
                   ),
-                  _buildPage(),
                 ],
               ),
             ),

@@ -30,10 +30,7 @@ class Utils {
   }
 
   static int _getNumberOfPagesWhichShouldHaveBeenRead(Data data) {
-    if (data.days.isEmpty) return _getDayLimit(data);
-
-    Day firstDay = data.days.first;
-    int dayDifference = DateTime.now().difference(firstDay.date).inDays + 1;
+    int dayDifference = DateTime.now().difference(data.start).inDays + 1;
 
     return dayDifference * _getDayLimit(data);
   }
@@ -65,5 +62,9 @@ class Utils {
     if (!today.dayLimitReached) return false;
 
     return true;
+  }
+
+  static String getFormattedDateTime(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
   }
 }
